@@ -19,6 +19,16 @@ func main() {
 	switch *dayPtr {
 	case 1:
 		days.SolveDay1(input)
+	case 2:
+		fmt.Println("solving part 1")
+		days.SolveDay2Part1(input)
+		fmt.Println("solving part 2")
+		days.SolveDay2Part2(input)
+	case 3:
+		fmt.Println("solving part 1")
+		days.SolveDay3Part1(input)
+		fmt.Println("solving part 2")
+		days.SolveDay3Part2(input)
 	default:
 		panic("invalid day provided")
 	}
