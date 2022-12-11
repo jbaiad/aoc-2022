@@ -5,7 +5,6 @@ import (
 	"embed"
 	"fmt"
 	"math"
-	"strconv"
 	"strings"
 )
 
@@ -17,14 +16,17 @@ func calculatePriority(item rune) int {
 		priority = int(item) - 96
 	}
 
+	if calculateCharacter(priority) != item {
+		panic("incorrect inversion")
+	}
 	return priority
 }
 
-func calculateCharacter(priority int) string {
+func calculateCharacter(priority int) rune {
 	if 1 <= priority && priority <= 26 {
-		return string(priority + 96)
+		return rune(priority + 96)
 	} else {
-		return string(priority + 38)
+		return rune(priority + 38)
 	}
 }
 
@@ -104,50 +106,47 @@ func SolveDay3Part2(input embed.FS) (int, error) {
 		// corresponding integer has a 1 in the p-th most significant bit
 		// if it contains the item with priority p + 1.
 		elf_1 := strings.TrimSpace(scanner.Text())
-		elf_1_rucksack_num := int64(0)
+		elf_1_rucksack_num := uint(0)
 		for _, item := range elf_1 {
 			priority := calculatePriority(item)
-			priorityEncoding := math.Exp2(float64(priority - 1))
-			fmt.Printf("\t...adding 2^(%d - 1) = %f ~ %d to rucksack num since %s has priority %d\n", priority, priorityEncoding, int64(priorityEncoding), string(item), priority)
-			elf_1_rucksack_num += int64(priorityEncoding)
+			priorityEncoding := uint(1 << (priority - 1))
+			fmt.Printf("\t...adding 2^(%d - 1) = %d to rucksack num since %s has priority %d\n", priority, priorityEncoding, string(item), priority)
+			elf_1_rucksack_num += priorityEncoding
 		}
 		fmt.Printf("\tElf 1's rucksack string: %s\n", elf_1)
 		fmt.Printf("\tElf 1's rucksack number (decimal): %d\n", elf_1_rucksack_num)
-		fmt.Printf("\tElf 1's rucksack number (binary): %s\n\n", strconv.FormatInt(elf_1_rucksack_num, 2))
 
 		if !scanner.Scan() {
 			panic("BAD INPUT!")
 		}
 		elf_2 := strings.TrimSpace(scanner.Text())
-		elf_2_rucksack_num := int64(0)
+		elf_2_rucksack_num := uint(0)
 		for _, item := range elf_2 {
 			priority := calculatePriority(item)
-			priorityEncoding := math.Exp2(float64(priority - 1))
-			fmt.Printf("\t...adding 2^(%d - 1) = %f ~ %d to rucksack num since %s has priority %d\n", priority, priorityEncoding, int64(priorityEncoding), string(item), priority)
-			elf_2_rucksack_num += int64(priorityEncoding)
+			priorityEncoding := uint(1 << (priority - 1))
+			fmt.Printf("\t...adding 2^(%d - 1) = %d to rucksack num since %s has priority %d\n", priority, priorityEncoding, string(item), priority)
+			elf_2_rucksack_num += priorityEncoding
 		}
 		fmt.Printf("\tElf 2's rucksack string: %s\n", elf_2)
 		fmt.Printf("\tElf 2's rucksack number (decimal): %d\n", elf_2_rucksack_num)
-		fmt.Printf("\tElf 2's rucksack number (binary): %s\n\n", strconv.FormatInt(elf_2_rucksack_num, 2))
 
 		if !scanner.Scan() {
 			panic("BAD INPUT!")
 		}
 		elf_3 := strings.TrimSpace(scanner.Text())
-		elf_3_rucksack_num := int64(0)
+		elf_3_rucksack_num := uint(0)
 		for _, item := range elf_3 {
 			priority := calculatePriority(item)
-			priorityEncoding := math.Exp2(float64(priority - 1))
-			fmt.Printf("\t...adding 2^(%d - 1) = %f ~ %d to rucksack num since %s has priority %d\n", priority, priorityEncoding, int64(priorityEncoding), string(item), priority)
-			elf_3_rucksack_num += int64(priorityEncoding)
+			priorityEncoding := uint(1 << (priority - 1))
+			fmt.Printf("\t...adding 2^(%d - 1) = %d to rucksack num since %s has priority %d\n", priority, priorityEncoding, string(item), priority)
+			elf_3_rucksack_num += priorityEncoding
 		}
 		fmt.Printf("\tElf 3's rucksack string: %s\n", elf_3)
 		fmt.Printf("\tElf 3's rucksack number (decimal): %d\n", elf_3_rucksack_num)
-		fmt.Printf("\tElf 3's rucksack number (binary): %s\n\n", strconv.FormatInt(elf_3_rucksack_num, 2))
 
 		intersection := elf_1_rucksack_num & elf_2_rucksack_num & elf_3_rucksack_num
-		item := math.Log2(float64(intersection))
-		fmt.Printf("\tintersection = %d, common item (float) = %f, common item (character) = %s\n", intersection, item, calculateCharacter(int(item)))
+		priority := int(math.Log2(float64(intersection))) + 1
+		fmt.Printf("\tintersection = %d, common priority (decimal) = %d, common item (character) = %s\n", intersection, priority, string(calculateCharacter(priority)))
 
 		group_num += 1
 		line_num += 3
