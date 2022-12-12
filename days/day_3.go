@@ -76,6 +76,32 @@ func SolveDay3Part1(input embed.FS) (int, error) {
 	return priority_sum, nil
 }
 
+func StringToRuneSlice(s string) []rune {
+	var r []rune
+	for _, runeValue := range s {
+		r = append(r, runeValue)
+	}
+	return r
+}
+
+func GetRucksackNum(r string) uint {
+	rucksack_items := StringToRuneSlice(r)
+	rucksack_num := uint(0)
+	seen := map[rune]bool{}
+	for _, item := range rucksack_items {
+		if _, seen_before := seen[item]; seen_before {
+			continue
+		}
+		seen[item] = true
+
+		priority := calculatePriority(item)
+		priorityEncoding := uint(1 << (priority - 1))
+		rucksack_num += priorityEncoding
+	}
+
+	return rucksack_num
+}
+
 func SolveDay3Part2(input embed.FS) (int, error) {
 	f, err := input.Open("input/day-03.txt")
 	if err != nil {
@@ -85,6 +111,16 @@ func SolveDay3Part2(input embed.FS) (int, error) {
 
 	scanner := bufio.NewScanner(f)
 	scanner.Split(bufio.ScanLines)
+
+	priorityLine := ""
+	characterLine := ""
+	for priority := 1; priority <= 52; priority++ {
+		char := calculateCharacter(priority)
+		priorityLine += fmt.Sprintf("|%02d", priority)
+		characterLine += fmt.Sprintf("| %s", string(char))
+	}
+	priorityLine += "|\n"
+	characterLine += "|\n"
 
 	/* Parse the file line by line:
 	Each line represents the contents of a rucksack, which is divided into two
@@ -102,55 +138,43 @@ func SolveDay3Part2(input embed.FS) (int, error) {
 		fmt.Printf("beginning at line: %d\n", line_num)
 
 		// Process each rucksack into an integer between 0 and 2^52 - 1
-		// that uniquely encodes the rucksack's contents. A rucksack's
+		// that uniquely encodes the rucksack's distinct items. A rucksack's
 		// corresponding integer has a 1 in the p-th most significant bit
 		// if it contains the item with priority p + 1.
 		elf_1 := strings.TrimSpace(scanner.Text())
-		elf_1_rucksack_num := uint(0)
-		for _, item := range elf_1 {
-			priority := calculatePriority(item)
-			priorityEncoding := uint(1 << (priority - 1))
-			fmt.Printf("\t...adding 2^(%d - 1) = %d to rucksack num since %s has priority %d\n", priority, priorityEncoding, string(item), priority)
-			elf_1_rucksack_num += priorityEncoding
-		}
-		fmt.Printf("\tElf 1's rucksack string: %s\n", elf_1)
-		fmt.Printf("\tElf 1's rucksack number (decimal): %d\n", elf_1_rucksack_num)
+		elf_1_rucksack_num := GetRucksackNum(elf_1)
 
 		if !scanner.Scan() {
 			panic("BAD INPUT!")
 		}
 		elf_2 := strings.TrimSpace(scanner.Text())
-		elf_2_rucksack_num := uint(0)
-		for _, item := range elf_2 {
-			priority := calculatePriority(item)
-			priorityEncoding := uint(1 << (priority - 1))
-			fmt.Printf("\t...adding 2^(%d - 1) = %d to rucksack num since %s has priority %d\n", priority, priorityEncoding, string(item), priority)
-			elf_2_rucksack_num += priorityEncoding
-		}
-		fmt.Printf("\tElf 2's rucksack string: %s\n", elf_2)
-		fmt.Printf("\tElf 2's rucksack number (decimal): %d\n", elf_2_rucksack_num)
+		elf_2_rucksack_num := GetRucksackNum(elf_2)
 
 		if !scanner.Scan() {
 			panic("BAD INPUT!")
 		}
 		elf_3 := strings.TrimSpace(scanner.Text())
-		elf_3_rucksack_num := uint(0)
-		for _, item := range elf_3 {
-			priority := calculatePriority(item)
-			priorityEncoding := uint(1 << (priority - 1))
-			fmt.Printf("\t...adding 2^(%d - 1) = %d to rucksack num since %s has priority %d\n", priority, priorityEncoding, string(item), priority)
-			elf_3_rucksack_num += priorityEncoding
-		}
-		fmt.Printf("\tElf 3's rucksack string: %s\n", elf_3)
-		fmt.Printf("\tElf 3's rucksack number (decimal): %d\n", elf_3_rucksack_num)
+		elf_3_rucksack_num := GetRucksackNum(elf_3)
 
 		intersection := elf_1_rucksack_num & elf_2_rucksack_num & elf_3_rucksack_num
 		priority := int(math.Log2(float64(intersection))) + 1
+		priority_sum += priority
+		fmt.Printf("\tElf 1's rucksack string: %s\n", string(elf_1))
+		fmt.Printf("\tElf 1's rucksack number (decimal): %d\n", elf_1_rucksack_num)
+		fmt.Printf("\tElf 2's rucksack string: %s\n", string(elf_2))
+		fmt.Printf("\tElf 2's rucksack number (decimal): %d\n", elf_2_rucksack_num)
+		fmt.Printf("\tElf 3's rucksack string: %s\n", string(elf_3))
+		fmt.Printf("\tElf 3's rucksack number (decimal): %d\n", elf_3_rucksack_num)
 		fmt.Printf("\tintersection = %d, common priority (decimal) = %d, common item (character) = %s\n", intersection, priority, string(calculateCharacter(priority)))
+
+		fmt.Printf(characterLine)
+		fmt.Print(priorityLine)
 
 		group_num += 1
 		line_num += 3
 	}
+
+	fmt.Printf("PRIORITY SUM = %d\n", priority_sum)
 
 	return priority_sum, nil
 }
