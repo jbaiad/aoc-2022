@@ -29,6 +29,11 @@ func main() {
 		days.SolveDay3Part1(input)
 		fmt.Println("solving part 2")
 		days.SolveDay3Part2(input)
+	case 4:
+		fmt.Println("solving part 1")
+		days.SolveDay4Part1(input)
+		fmt.Println("solving part 2")
+		days.SolveDay4Part2(input)
 	default:
 		panic("invalid day provided")
 	}
